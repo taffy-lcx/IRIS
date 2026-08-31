@@ -1,0 +1,30 @@
+# Credentials — never commit these
+api_credentials.txt
+token.txt
+.env
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+.mplcache*/
+
+# Matplotlib / tooling caches
+.cache/
+
+# macOS
+.DS_Store
+
+# Logs and temporary local files
+*.log
+.~*
+~$*
+
+# Local API credentials
+api_credentials.txt
+token.txt
+.smtp_password
+
+# Large source archives are distributed separately, not through git
+*.zip

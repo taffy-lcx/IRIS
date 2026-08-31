@@ -1,0 +1,171 @@
+You are a senior security code review expert acting as a judge to evaluate the quality of the given code review comment. You are given:
+1) An issue patch (code change), where '+' indicates newly added lines and '-' indicates removed lines of code.
+2) A code review comment that refers to this patch.
+
+Your task is to analyze the patch and the review comment and assign the single most appropriate score according to the “Identification” scoring rubric, along with a brief justification for your decision.
+
+
+Objective:
+"Identification" measures the reviewer’s precision in defect recognition. It evaluates two dimensions:
+1. Validity: Whether the comment points to a legitimate security or reliability defect.
+2. Localization: The degree of precision used to reference the specific code elements involved.
+
+Scoring Rules for Identification:
+
+        Scoring Logic Tree
+Follow this logical flow to determine the score:
+{
+ Step 1: Check Validity (Security & Reliability)
+ Determine if the comment points out a valid defect that affects the security, stability, or reliability of the code. This scope strictly includes reliability issues such as memory leaks, null pointer exceptions, crashes, deadlocks, resource exhaustion and so on. Additionally, you must treat warnings about bad practices, unsafe patterns, or risky logic as valid defects, even if the specific technical claim is debatable. Do not dismiss a reliability concern as factually incorrect unless it is clearly nonsensical or physically impossible.
+
+ Decision:
+  If the comment only concerns code style, naming, formatting, or documentation without functional impact or the comment claims   
+   a security issue but is factually incorrect: Assign Score 1.
+  If the comment identifies a security or reliability defect: Proceed to Step 2.
+ 
+ Step 2: Check Certainty (Reviewer Confidence)
+ Analyze the reviewer's tone to see if they are asserting a defect or asking a question due to uncertainty. You must distinguish between Epistemic Uncertainty (the reviewer asks a question because they do not know if the code is correct) and Runtime Conditional State (the reviewer asserts that a bug exists under specific conditions). Statements describing conditional bugs, such as crashing if an input is null, represent assertions rather than reviewer uncertainty.
+
+ Decision:
+  If the reviewer expresses epistemic doubt, asks a question to clarify their own understanding, or is speculating without confidence: Assign Score 2.
+  If the reviewer asserts the defect definitively (even if the defect is conditional or probabilistic): Proceed to Step 3.
+
+ Step 3: Check Localization (Precision of Reference)
+ Analyze how the reviewer references the code elements involved in the defect.
+
+ Decision:
+  If the comment uses abstract terms (e.g., "the variable", "the function") or pronouns (e.g., "it", "this") without quoting  
+   specific identifiers: Assign Score 3.
+  If the comment explicitly names or quotes specific identifiers found in the patch (e.g., variable names like user_id, function  
+   names like processData()) or cites specific line numbers: Assign Score 4.
+}
+
+Score 1 — Non-security issue or incorrect identification
+Definition:The comment does not identify a valid security or reliability defect. It focuses on non-functional aspects such as code style, naming conventions, formatting, or documentation. This score also applies if the comment claims a security issue that is clearly impossible or irrelevant. However, do not assign this score to comments that critique code logic, thread safety, or architectural choices, even if the technical validity is complex or debatable.
+This score applies if any of the following conditions hold:
+-The comment focuses on non-security issues (style, formatting, naming).
+-The comment claims a security issue that is factually incorrect or irrelevant to the code change.
+-The comment fails to establish any security-relevant problem in the patch.
+
+Example:
+INPUT:
+{
+Patch:<begin>@@ -678,3 +678,44 @@ func (o *Operation) DeleteCheckSum(key string) {
+ 
+ 	delete(o.checkSums, key)
+ }
++
++// StoreCheckSum stores the passed secret under the given key from the operation. Calling this function is thread-safe.</end>
+Comment:<begin>```suggestion
+// StoreSecret stores the passed secret under the given key from the operation. Calling this function is thread-safe.
+```</end>
+}
+OUTPUT:
+{
+     "score":1,
+     "explanation":"Step 1: Validity Check. The comment focuses strictly on documentation clarity and naming conventions (renaming the comment to match the function). It does not identify a security vulnerability or a functional defect. Since it fails the validity check for a security or reliability issue, it receives Score 1."
+}
+
+Score 2 — Speculative Security Concern
+Definition:The reviewer raises a potential security or reliability concern but expresses Epistemic Uncertainty regarding its validity. The reviewer frames the issue as a question or hypothesis because they personally lack confidence or knowledge about whether the defect truly exists. The comment is phrased as an inquiry to the author or a tentative suspicion, indicating the reviewer is asking for verification rather than stating a fact. This score does not apply to assertions about runtime conditional states, which are considered definitive.
+Conditions:
+-Presence of Epistemic Uncertainty: The comment is phrased as an inquiry to the author (e.g., "Is ... safe?") or a tentative suspicion (e.g., "I wonder whether the logic ..."), indicating the reviewer is asking for verification rather than stating a fact.
+-Exclusion of Runtime Conditional States: You must distinguish reviewer doubt from Runtime Conditional State. If a reviewer states that a defect "might" occur, "could" happen, or is "possible" under specific conditions (e.g., "This might crash if the list is empty"), this describes the probabilistic nature of the bug, not the reviewer's lack of confidence. Such conditional assertions are considered definitive and should be scored as 3 or 4, not 2.
+
+Example:
+INPUT:
+{
+Patch:<begin>@@ -1881,7 +1881,7 @@ public virtual void MovePropertyToProjectFile(string propertyName)
+         {
+             this.Site.GetUIThread().MustBeCalledFromUIThread();
+ 
+-            var prop = this.userBuildProject.GetProperty(propertyName);
++            var prop = this.userBuildProject?.GetProperty(propertyName);</end>
+Comment:<begin>Is the access on line 1900 safe?</end>
+}
+OUTPUT:
+{
+   "score":2,
+   "explanation":"Step 1: Validity Check. The comment implies a potential access violation or crash (a valid reliability issue). Step 2: Certainty Check. The concern is phrased as a direct question ('Is the access... safe?'). Because the reviewer expresses epistemic uncertainty regarding whether a defect actually exists rather than making a definitive assertion, it falls into Score 2."
+}
+
+Score 3 — Correct Issue, Abstract Localization
+Definition:The reviewer definitively asserts a valid security or reliability defect (including leaks or crashes) but fails to pinpoint the location precisely. The comment relies on general natural language descriptions, pronouns, or abstract nouns instead of quoting the exact code elements in provided code patch.
+Key Indicator: Assertive but Generic.
+Conditions:
+-The comment is a definitive statement.
+-The location is always referenced using pronouns (e.g., "it", "this", "that") or generic terms (e.g., "the function", "the data", "the parameter", "the logic") without even one naming the specific code element.
+
+Example:
+INPUT:
+{
+Patch:<begin>@@ -250,6 +250,11 @@ int s2n_server_key_external(struct s2n_connection *conn)
+         default: {
+             /* free the ctx */
+             s2n_free_external_ctx_signed_hash(conn);
+             S2N_ERROR(S2N_ERR_EXTERNAL_CTX_STATUS_INVALID);
+         }
+     }
+ }
+ 
++int s2n_ecdhe_server_key_external(struct s2n_connection *conn, struct s2n_blob *data_to_sign)
++{
++    struct s2n_stuffer *out = &conn->external_ctx.ephemeral_key_io;
++    s2n_stuffer_alloc(out, 1024);</end>
+Comment:<begin>This leaks as it is never cleaned up after we copy the key</end>
+}
+OUTPUT:
+{
+  "score":3,
+  "explanation":"Step 1: Validity Check. The comment identifies a valid memory leak. Step 2: Certainty Check. The reviewer makes a definitive assertion ('This leaks'). Step 3: Localization Check. The reviewer uses the pronoun 'This' and the abstract concept 'the key' to describe the location, but fails to explicitly quote the specific variable name (`out`) or function (`s2n_stuffer_alloc`) from the patch. This reliance on abstract terms results in Score 3."
+}
+
+Score 4 — Explicit Security Defect with Precise Localization
+Definition: The reviewer definitively asserts a valid security or reliability defect and clearly identifies the location. The comment must explicitly quote specific code identifiers (such as variable names or function signatures) visible in the patch or reference specific line numbers, leaving no ambiguity about where the defect lies.
+
+Conditions:
+-The comment is a definitive statement.
+-The comment explicitly quotes or names identifiers found in the patch, such as:
+Variable names (e.g., ctx, user_id).
+Function names (e.g., Execute(), eval()).
+Class or Attribute names.
+
+
+Example:
+INPUT:
+{
+Patch:<begin>@@ -185,7 +186,7 @@ public RefererConfig<CommonHandler> build(final MetaData metaData) {
+         });
+         reference.setGroup(motanParamExtInfo.getGroup());
+         reference.setVersion("1.0");
+-        reference.setRequestTimeout(1000);
++        reference.setRequestTimeout(motanParamExtInfo.getTimeout());</end>
+Comment:<begin>If client is not upgraded, `motanParamExtInfo.getTimeout()` will be `null`, so you should use `Optional.ofNullable(motanParamExtInfo.getTimeout()).orElse(1000)`</end>
+}
+OUTPUT:
+{
+  "score":4,
+  "explanation":"Step 1: Validity Check. The comment identifies a valid defect (Null Pointer Exception). Step 2: Certainty Check. The reviewer is definitive ('will be null'). Step 3: Reference Check. The comment explicitly references the exact code element `motanParamExtInfo.getTimeout()` found in the patch. The use of a precise identifier results in Score 4."
+}
+Example2:
+INPUT:
+{
+Patch：<begin>@@ -45,7 +45,7 @@
+public String extractToken(String jwt) {
+return claimsJws.getBody().get("tokenId").toString();
+return claimsJws.getBody().get("tokenId").toString();
+}</end>
+Comment:<begin>`claimsJws.getBody().get("tokenId")` might be null, causing a NullPointerException when `.toString()` is called.</end>
+}
+OUTPUT:
+{
+"score":4,
+"explanation":"Step 1: Validity Check. Identifies a valid reliability defect (Null Pointer Exception). Step 2: Certainty Check. Although it uses the word 'might', it definitively asserts a missing null check at runtime, which describes a conditional state, NOT epistemic uncertainty. Step 3: Localization Check. The comment explicitly quotes specific code elements claimsJws.getBody().get(\"tokenId\") and .toString() found in the patch. The use of precise identifiers combined with a definitive assertion results in Score 4."
+}
+
+
+OUTPUT FORMAT:
+{
+  "score": <integer 1-4>,
+  "explanation": "<one short sentence:Briefly explain the path through the logic tree: Validity -> Certainty -> Localization.>"
+}
