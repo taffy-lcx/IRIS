@@ -42,7 +42,7 @@ Source collection
 | Path | Description |
 |---|---|
 | [`data/`](data/) | Literature-survey records and practitioner-source posts used for triangulation. |
-| [`sampling_new_361/`](sampling_new_361/) | The non-overlapping 361-comment sample, the full comment collection, and thematic-analysis results. |
+| [`thematic_analysis/`](thematic_analysis/) | The 361-comment sample, the full comment collection, and staged thematic-analysis results. |
 | [`taxonomy/`](taxonomy/) | The final taxonomy, intermediate manual coding workbooks, category definitions, and labeling decision order. |
 | [`annotation/`](annotation/) | The IRIS scoring rubric, three manual-scoring batches, final human scores, and analysis scripts. |
 | [`questionnaire/`](questionnaire/) | The practitioner questionnaire used in the study. |
