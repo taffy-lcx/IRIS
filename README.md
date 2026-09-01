@@ -130,12 +130,6 @@ results back to the corresponding `outputs/` directories. Existing output
 workbooks and figures are included so that the reported artifacts can be
 inspected without rerunning the analyses.
 
-> **Current release note:** the first two entry points import
-> `llm-evaluation/shared/metric_utils.py`, which is not included in the current
-> repository snapshot. Their saved metrics remain available, but those two
-> scripts require the shared utility before they can be recomputed. The repeated
-> single-model analysis is self-contained after installing the listed
-> dependencies.
 
 ## Reproducibility Scope
 
