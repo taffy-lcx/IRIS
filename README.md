@@ -67,9 +67,7 @@ llm-evaluation/datasets/
 ```
 
 For each dimension, `instances.xlsx` contains the evaluation instances and
-`human_scores.xlsx` contains the final human reference labels. The saved model
-outputs retain instance identifiers so that predictions can be joined with the
-human scores without relying on row order.
+`human_scores.xlsx` contains the final human reference labels.
 
 ## LLM Evaluation Settings
 
@@ -105,9 +103,7 @@ python -m pip install --upgrade pip
 python -m pip install -r llm-evaluation/requirements.txt
 ```
 
-The analysis code requires Python 3.9 or later. The main dependencies are
-`pandas`, `openpyxl`, `numpy`, `scipy`, `scikit-learn`, `matplotlib`, and
-`irrCAC`.
+The analysis code requires Python 3.9 or later.
 
 ## Reproducing the Offline Analyses
 
@@ -125,31 +121,11 @@ python llm-evaluation/02_cross_model_median_expert/evaluate_cross_model_strategi
 python llm-evaluation/03_single_model_repeated/evaluate_aggregation_strategies.py
 ```
 
-The scripts read the saved workbooks under `llm-evaluation/` and write their
-results back to the corresponding `outputs/` directories. Existing output
-workbooks and figures are included so that the reported artifacts can be
-inspected without rerunning the analyses.
-
-> **Current release note:** the first two entry points import
-> `llm-evaluation/shared/metric_utils.py`, which is not included in the current
-> repository snapshot. Their saved metrics remain available, but those two
-> scripts require the shared utility before they can be recomputed. The repeated
-> single-model analysis is self-contained after installing the listed
-> dependencies.
 
 ## Reproducibility Scope
 
 This repository provides the data, prompts, human labels, saved model outputs,
-and offline evaluation code used to inspect and analyze the study results. It
-does **not** include API credentials, service URLs, or scripts for sending
-requests to external LLM services. Consequently, the saved LLM generations can
-be evaluated offline, while regenerating the model responses requires a
-separate API setup.
-
-All spreadsheets are provided in `.xlsx` format, and figures are provided as
-`.pdf` files where applicable. Paths in the analysis scripts are resolved
-relative to the repository, so the commands above do not depend on a specific
-local installation directory.
+and offline evaluation code used to inspect and analyze the study results.
 
 ## License
 
