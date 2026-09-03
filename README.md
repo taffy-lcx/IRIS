@@ -12,7 +12,7 @@ complementary dimensions: **Identification**, **Reason**, **Impact**, and
 taxonomy and scoring rubric, human annotations, prompts, saved LLM judgments,
 and offline analysis scripts.
 
-![Overview](./figures/overview.png)
+![Overview](./figure/overview.png)
 
 ## IRIS Framework
 
