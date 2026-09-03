@@ -51,6 +51,7 @@ Source collection
 | [`llm-evaluation/01_single_model_judges/`](llm-evaluation/01_single_model_judges/) | One-shot judgments from four individual LLM judges, metrics, and comparison figures. |
 | [`llm-evaluation/02_cross_model_median_expert/`](llm-evaluation/02_cross_model_median_expert/) | Cross-model median aggregation and Qwen3-Max expert adjudication results. |
 | [`llm-evaluation/03_single_model_repeated/`](llm-evaluation/03_single_model_repeated/) | Three-run, same-model aggregation results and statistical comparisons. |
+| [`llm-evaluation/04_significance/`](llm-evaluation/04_significance/) | Macro-average RQ3.2 significance tests, one combined forest plot, and its reproducible script. |
 
 ## Evaluation Data
 
@@ -119,8 +120,10 @@ python llm-evaluation/02_cross_model_median_expert/evaluate_cross_model_strategi
 
 # Repeated single-model aggregation metrics and statistical tests
 python llm-evaluation/03_single_model_repeated/evaluate_aggregation_strategies.py
-```
 
+# RQ3.2 macro-average significance tests and combined forest plot
+python llm-evaluation/04_significance/run_rq32_significance.py
+```
 
 ## Reproducibility Scope
 
