@@ -89,6 +89,12 @@ Agreement with the human reference labels is reported using:
 - Spearman's rank correlation coefficient (rho)
 - Gwet's AC2 with quadratic weights
 
+For the combined RQ3.2 effect analysis, macro-averaged differences in quadratic
+weighted kappa are evaluated using 10,000 paired bootstrap iterations and
+10,000 paired permutation iterations (seed `20260902`). Holm correction is
+applied separately within each effect panel across the four IRIS dimensions;
+figure asterisks indicate Holm-adjusted `p < 0.05`.
+
 The repeated-strategy analysis additionally uses the exact McNemar test for
 Exact Match and paired bootstrap tests for QWK, Spearman's rho, and Gwet's AC2.
 

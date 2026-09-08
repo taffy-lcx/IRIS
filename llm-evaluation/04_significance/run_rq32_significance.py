@@ -324,6 +324,19 @@ def macro_effect(
     }
 
 
+def holm_adjust(p_values: pd.Series) -> pd.Series:
+    """Return Holm-adjusted p-values in the original row order."""
+    values = p_values.to_numpy(dtype=float)
+    order = np.argsort(values)
+    ranked = values[order]
+    adjusted_ranked = np.maximum.accumulate(
+        (len(values) - np.arange(len(values))) * ranked
+    )
+    adjusted = np.empty_like(adjusted_ranked)
+    adjusted[order] = np.minimum(adjusted_ranked, 1.0)
+    return pd.Series(adjusted, index=p_values.index)
+
+
 def compute_summary(all_data: dict[str, dict]) -> pd.DataFrame:
     rows = []
     random_cache = {
@@ -352,7 +365,10 @@ def compute_summary(all_data: dict[str, dict]) -> pd.DataFrame:
             )
 
     summary = pd.DataFrame(rows)
-    summary["significant"] = summary["p_raw"] < ALPHA
+    summary["p_holm"] = summary.groupby("effect", group_keys=False)[
+        "p_raw"
+    ].transform(holm_adjust)
+    summary["significant"] = summary["p_holm"] < ALPHA
     return summary[
         [
             "effect",
@@ -361,6 +377,7 @@ def compute_summary(all_data: dict[str, dict]) -> pd.DataFrame:
             "ci_lower",
             "ci_upper",
             "p_raw",
+            "p_holm",
             "significant",
         ]
     ]
