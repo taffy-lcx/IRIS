@@ -47,13 +47,22 @@ Source collection
 | [`thematic_analysis/`](thematic_analysis/) | The 361-comment sample, the full comment collection, and staged thematic-analysis results. |
 | [`taxonomy/`](taxonomy/) | The final taxonomy, intermediate manual coding workbooks, category definitions, and labeling decision order. |
 | [`annotation/`](annotation/) | The IRIS scoring rubric, three manual-scoring batches, final human scores, and analysis scripts. |
-| [`questionnaire/`](questionnaire/) | The practitioner questionnaire used in the study. |
+| [`questionnaire/`](questionnaire/) | The survey instrument, anonymized responses, and aggregated participant-background proportions. |
 | [`llm-evaluation/datasets/`](llm-evaluation/datasets/) | Evaluation instances and final human reference scores, organized by IRIS dimension. |
 | [`llm-evaluation/prompts/`](llm-evaluation/prompts/) | Base-judge and expert-adjudicator prompts for each dimension. |
 | [`llm-evaluation/01_single_model_judges/`](llm-evaluation/01_single_model_judges/) | One-shot judgments from four individual LLM judges, metrics, and comparison figures. |
 | [`llm-evaluation/02_cross_model_median_expert/`](llm-evaluation/02_cross_model_median_expert/) | Cross-model median aggregation and Qwen3-Max expert adjudication results. |
 | [`llm-evaluation/03_single_model_repeated/`](llm-evaluation/03_single_model_repeated/) | Three-run, same-model aggregation results and statistical comparisons. |
 | [`llm-evaluation/04_significance/`](llm-evaluation/04_significance/) | Macro-average RQ3.2 significance tests, one combined forest plot, and its reproducible script. |
+
+## Questionnaire Data
+
+The questionnaire directory contains the survey instrument and an anonymized
+response workbook. In `survey_responses_anonymized.xlsx`, the first sheet keeps
+response dates at day-level precision and the research-question responses.
+Direct contact information and row-level participant-background attributes are
+omitted. The second sheet reports generalized participant-background
+distributions as percentages.
 
 ## Evaluation Data
 

@@ -28,3 +28,6 @@ token.txt
 
 # Large source archives are distributed separately, not through git
 *.zip
+
+# Raw questionnaire exports may contain participant-level identifiers
+questionnaire/*.csv
